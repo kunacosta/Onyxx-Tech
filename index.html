@@ -341,7 +341,6 @@ nav.scrolled { border-bottom-color: var(--line); }
 
 .btn-primary:hover {
   background: var(--accent);
-  transform: translateY(-2px);
   box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
 }
 
@@ -354,7 +353,6 @@ nav.scrolled { border-bottom-color: var(--line); }
 .btn-secondary:hover {
   border-color: var(--accent);
   color: var(--accent);
-  transform: translateY(-2px);
 }
 
 .btn .arrow {
@@ -2064,6 +2062,82 @@ modalOverlay.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
+});
+
+// ============ TEXT SCRAMBLE ============
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%!?';
+const PRESERVE = new Set([' ', ' ', '—', '/', '.', '-', '·']);
+
+function scramble(el, duration = 1200) {
+  const original = el.textContent;
+  let start = null;
+  function frame(ts) {
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / duration, 1);
+    const resolved = Math.floor(progress * original.length);
+    el.textContent = original.split('').map((char, i) => {
+      if (PRESERVE.has(char) || i < resolved) return char;
+      return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+    }).join('');
+    if (progress < 1) requestAnimationFrame(frame);
+    else el.textContent = original;
+  }
+  requestAnimationFrame(frame);
+}
+
+const scrambleObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      scramble(entry.target);
+      scrambleObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.8 });
+
+document.querySelectorAll('.section-label').forEach(el => scrambleObserver.observe(el));
+
+setTimeout(() => {
+  const heroTagText = document.querySelector('.hero-tag span:last-child');
+  if (heroTagText) scramble(heroTagText, 1500);
+}, 900);
+
+// ============ TILT CARDS ============
+document.querySelectorAll('.project-card').forEach(card => {
+  const glare = document.createElement('div');
+  glare.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:5;opacity:0;transition:opacity 0.3s ease;';
+  card.appendChild(glare);
+
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    card.style.transition = 'transform 0.1s ease, background 0.4s ease';
+    card.style.transform = `perspective(900px) rotateX(${(y - 0.5) * -10}deg) rotateY(${(x - 0.5) * 10}deg)`;
+    glare.style.opacity = '1';
+    glare.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(56,224,255,0.06) 0%, transparent 65%)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transition = 'transform 0.6s ease, background 0.4s ease';
+    card.style.transform = '';
+    glare.style.opacity = '0';
+  });
+});
+
+// ============ MAGNETIC BUTTONS ============
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = (e.clientX - rect.left - rect.width / 2) * 0.3;
+    const y = (e.clientY - rect.top - rect.height / 2) * 0.3;
+    btn.style.transition = 'transform 0.1s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease';
+    btn.style.transform = `translate(${x}px, ${y}px)`;
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transition = 'transform 0.5s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease';
+    btn.style.transform = '';
+  });
 });
 </script>
 
