@@ -190,8 +190,8 @@ nav.scrolled { border-bottom-color: var(--line); }
   inset: 0;
   z-index: 1;
   opacity: 0.45;
-  mask-image: linear-gradient(to right, transparent 70%, black 87%);
-  -webkit-mask-image: linear-gradient(to right, transparent 70%, black 87%);
+  mask-image: linear-gradient(to right, transparent 50%, black 72%);
+  -webkit-mask-image: linear-gradient(to right, transparent 50%, black 72%);
 }
 
 .hero-content {
@@ -1931,8 +1931,8 @@ function initNodes() {
   const h = canvas.offsetHeight;
   for (let i = 0; i < NUM_NODES; i++) {
     nodes.push({
-      x: w * 0.72 + Math.random() * w * 0.28,
-      y: Math.random() * h * 0.50,
+      x: w * 0.55 + Math.random() * w * 0.45,
+      y: Math.random() * h * 0.75,
       vx: (Math.random() - 0.5) * 0.3,
       vy: (Math.random() - 0.5) * 0.3,
       r: Math.random() * 1.5 + 0.5,
@@ -1970,8 +1970,8 @@ function draw() {
     n.y += n.vy;
     n.pulse += 0.02;
 
-    if (n.x < w * 0.70 || n.x > w) n.vx *= -1;
-    if (n.y < 0 || n.y > h * 0.55) n.vy *= -1;
+    if (n.x < w * 0.52 || n.x > w) n.vx *= -1;
+    if (n.y < 0 || n.y > h * 0.80) n.vy *= -1;
 
     const pulseR = n.r + Math.sin(n.pulse) * 0.5;
     ctx.fillStyle = `rgba(0, 212, 255, ${0.6 + Math.sin(n.pulse) * 0.3})`;
